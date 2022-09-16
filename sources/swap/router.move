@@ -43,12 +43,12 @@ module liquidswap::router {
     // Public functions.
 
     /// Register new liquidity pool for `X`/`Y` pair on signer address with `LP` coin.
-    /// * `curve_type` - pool curve type: 1 = stable, 2 = uncorrelated (uniswap like).
+    /// * `econia_market_id` - market id with the same assets(X and Y) in Econia.
     ///
     /// Note: X, Y generic coin parameters must be sorted.
-    public fun register_pool<X, Y, Curve>(account: &signer) {
+    public fun register_pool<X, Y, Curve>(account: &signer, econia_market_id: u64) {
         assert!(coin_helper::is_sorted<X, Y>(), ERR_WRONG_COIN_ORDER);
-        liquidity_pool::register<X, Y, Curve>(account);
+        liquidity_pool::register<X, Y, Curve>(account, econia_market_id);
     }
 
     /// Add liquidity to pool `X`/`Y` with rationality checks.

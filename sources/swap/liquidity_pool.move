@@ -19,6 +19,7 @@ module liquidswap::liquidity_pool {
     use liquidswap::stable_curve;
     use liquidswap::lp_account;
     use liquidswap_lp::lp_coin::LP;
+    use econia::user;
 
     // Error codes.
 
@@ -84,6 +85,7 @@ module liquidswap::liquidity_pool {
         x_scale: u64,
         y_scale: u64,
         locked: bool,
+        econia_market_id: u64,
     }
 
     /// Flash loan resource
@@ -106,8 +108,8 @@ module liquidswap::liquidity_pool {
 
     /// Register liquidity pool `X`/`Y`.
     /// Parameters:
-    /// * `curve_type` - pool curve type: 1 = stable, 2 = uncorrelated (uniswap like).
-    public fun register<X, Y, Curve>(acc: &signer) acquires PoolAccountCapability {
+    /// * `econia_market_id` - market id with the same assets(X and Y) in Econia.
+    public fun register<X, Y, Curve>(acc: &signer, econia_market_id: u64) acquires PoolAccountCapability {
         assert_no_emergency();
 
         assert_is_coin<X>();
@@ -153,8 +155,12 @@ module liquidswap::liquidity_pool {
             x_scale,
             y_scale,
             locked: false,
+            econia_market_id,
         };
         move_to(&pool_account, pool);
+
+        // Register Econia market account
+        user::register_market_account<X, Y>(&pool_account, econia_market_id, 0);
 
         dao_storage::register<X, Y, Curve>(&pool_account);
 
@@ -188,6 +194,12 @@ module liquidswap::liquidity_pool {
 
         let (x_reserve_size, y_reserve_size) = get_reserves_size<X, Y, Curve>();
 
+        let x_val = coin::value<X>(&coin_x);
+        let y_val = coin::value<Y>(&coin_y);
+
+        let x_deposit_to_econia = coin::extract(&mut coin_x, x_val / 2);
+        let y_deposit_to_econia = coin::extract(&mut coin_y, y_val / 2);
+
         let x_provided_val = coin::value<X>(&coin_x);
         let y_provided_val = coin::value<Y>(&coin_y);
 
@@ -209,6 +221,10 @@ module liquidswap::liquidity_pool {
         let pool = borrow_global_mut<LiquidityPool<X, Y, Curve>>(@liquidswap_pool_account);
         coin::merge(&mut pool.coin_x_reserve, coin_x);
         coin::merge(&mut pool.coin_y_reserve, coin_y);
+
+        // Deposit coins to Econia market
+        user::deposit_coins(@liquidswap_pool_account, pool.econia_market_id, 0, x_deposit_to_econia);
+        user::deposit_coins(@liquidswap_pool_account, pool.econia_market_id, 0, y_deposit_to_econia);
 
         let lp_coins = coin::mint<LP<X, Y, Curve>>(provided_liq, &pool.lp_mint_cap);
 
@@ -711,7 +727,7 @@ module liquidswap::liquidity_pool {
         x_reserve: u64,
         y_reserve: u64,
     ): (u128, u128, u64) acquires EventsStore, LiquidityPool, PoolAccountCapability {
-        register<X, Y, curves::Uncorrelated>(test_account);
+        register<X, Y, curves::Uncorrelated>(test_account, 0);
 
         let pool =
             borrow_global_mut<LiquidityPool<X, Y, curves::Uncorrelated>>(@liquidswap_pool_account);
