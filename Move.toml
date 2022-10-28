@@ -4,16 +4,16 @@ version = "0.4.1"
 upgrade_policy = "immutable"
 
 [addresses]
-liquidswap = "0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12"
+liquidswap = "0xb1bd5326bd07334bbba68aac7b8fb74478c6ccfaae07a0236884dd053e8cde48"
 
 # Admins
-dao_admin = "0x63e39817ec41fad2e8d0713cc906a5f792e4cd2cf704f8b5fab6b2961281fa11"
-emergency_admin = "0x63e39817ec41fad2e8d0713cc906a5f792e4cd2cf704f8b5fab6b2961281fa11"
-fee_admin = "0x63e39817ec41fad2e8d0713cc906a5f792e4cd2cf704f8b5fab6b2961281fa11"
+dao_admin = "0x48dff580cde5e02f850c82421c329dcdc519fa31fac8d9a0492236e045224369"
+emergency_admin = "0x48dff580cde5e02f850c82421c329dcdc519fa31fac8d9a0492236e045224369"
+fee_admin = "0x48dff580cde5e02f850c82421c329dcdc519fa31fac8d9a0492236e045224369"
 
 # Resource accounts: should be the same as @liquidswap_lp in lp_coin
-liquidswap_pool_account = "0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948"
-liquidswap_emergency_account = "0xa6d6e549b917e454464ff6c63f91386d98769ea512bc778bdaca00969f896764"
+liquidswap_pool_account = "0xcd09213f25e3312923acfd64149b2f5653dd2ff3157ed9d8e0f4f645f83a0926"
+liquidswap_emergency_account = "0x4b5b1a05b7acc0909c282329ac4b12160ee19c4ae15e09a699e178eead1acd4b"
 
 # Addresses for tests.
 test_coin_admin = "0x11"
